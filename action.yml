@@ -1,43 +1,21 @@
-name: action-name
+name: git-push
 author: gendloop
-description: 'action description'
+description: 'git-push'
 inputs:
 # Required
-  version:
-    description: 'New version. e.g. v0.0.0'
-    required: true
-    default: 'v0.0.0'
+  commit:
+    description: 'Commi message'
+    required: false
+    default: 'chore: update'
   token:
     description: 'Personal token'
     required: true
     default: ${{ github.token }}
-# Optional
-  branch:
-    description: 'branch'
-    required: false
-    default: main
 
 runs:
   using: 'composite'
   steps:
-    - name: checkout-repo
-      uses: actions/checkout@v3
-      with: 
-        token: ${{ inputs.token }}
-        fetch-depth: 0
-
-    - name: setup-node
-      uses: actions/setup-node@v3
-      with:
-        node-version: 16.x
-      
-    - name: add-release-log
-      shell: bash
-      run: npx changelogithub
-      env:
-        GITHUB_TOKEN: ${{ inputs.token }}
-
-    - name: cmd
+    - name: push
       shell: bash
       working-directory: ${{ github.workspace }}
       env:
@@ -45,24 +23,9 @@ runs:
       run: |
         git config --global user.name "$GITHUB_ACTOR"
         git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
-        git checkout ${{ inputs.branch }}
+        git config --global credential.helper store
+        echo "machine github.com login ${{ github.actor }} password ${{ inputs.token }}" > ~/.netrc
         git pull
-        repo_name=${GITHUB_REPOSITORY#*/}
-        version=${{ inputs.version }}
-        echo $repo_name
-        echo $version
-        if [[ ${version} =~ ^v(.*)\.(.*)\.(.*) ]] 
-        then
-          major=${BASH_REMATCH[1]}
-          minor=${BASH_REMATCH[2]}
-          patch=${BASH_REMATCH[3]}
-        fi
-        echo $major $minor $patch
-        echo "" > config.txt
-        echo "PROJECT_NAME=${repo_name}" >> config.txt
-        echo "${repo_name}_VERSION_MAJOR=${major}" >> config.txt
-        echo "${repo_name}_VERSION_MINOR=${minor}" >> config.txt
-        echo "${repo_name}_VERSION_PATCH=${patch}" >> config.txt
         git add .
-        (git commit -m "chore: release VERSION ${{ inputs.version }} ") || true
+        (git commit -m "${{ inputs.commit }}") || true
         (git push) || true
