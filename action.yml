@@ -3,26 +3,31 @@ author: gendloop
 description: 'git-push'
 inputs:
 # Required
-  commit:
-    description: 'Commi message'
-    required: false
-    default: 'chore: update'
   token:
     description: 'Personal token'
     required: true
     default: ${{ github.token }}
+# Optional
+  commit:
+    description: 'Commi message'
+    required: false
+    default: 'chore: update'
+  workspace:
+    description: 'Working directory'
+    required: false
+    default: ${{ github.workspace }}
 
 runs:
   using: 'composite'
   steps:
     - name: push
       shell: bash
-      working-directory: ${{ github.workspace }}
+      working-directory: ${{ inputs.workspace }}
       env:
           GITHUB_TOKEN: ${{ inputs.token }}
       run: |
-        git config --global user.name "$GITHUB_ACTOR"
-        git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
         git config --global credential.helper store
         echo "machine github.com login ${{ github.actor }} password ${{ inputs.token }}" > ~/.netrc
         git pull
