@@ -1,0 +1,5 @@
+
+PROJECT_NAME=git-push
+git-push_VERSION_MAJOR=1
+git-push_VERSION_MINOR=0
+git-push_VERSION_PATCH=0
