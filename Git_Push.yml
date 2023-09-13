@@ -2,7 +2,7 @@ name: Git_Push
 
 steps:
   - name: git-push
-    uses: gendloop/git-push@main
+    uses: gendloop/git-push@v1.0.0
     with:
       token: ${{ github.token }}
       commit: "chore: update"
