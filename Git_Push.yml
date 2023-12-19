@@ -6,5 +6,3 @@ steps:
     with:
       token: ${{ github.token }}
       commit: "chore: update"
-
-      
